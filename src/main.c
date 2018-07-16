@@ -83,6 +83,9 @@ static volatile bool main_b_cdc_enable = false;
 #ifdef SAMD21
 #define RESET_CONTROLLER PM
 #endif
+#ifdef SAML21
+#define RESET_CONTROLLER RSTC
+#endif
 #ifdef SAMD51
 #define RESET_CONTROLLER RSTC
 #endif

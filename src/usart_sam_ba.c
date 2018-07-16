@@ -117,6 +117,10 @@ void usart_open() {
     GCLK->CLKCTRL.reg = (clkctrl.reg | temp);
     #endif
 
+    #ifdef SAML21
+    #pragma message ( "SAML21 Usart Code needs implementing!!!" )
+    #endif
+
     #ifdef SAMD51
     GCLK->PCHCTRL[BOOT_GCLK_ID_CORE].reg = GCLK_PCHCTRL_GEN_GCLK0_Val | (1 << GCLK_PCHCTRL_CHEN_Pos);
     GCLK->PCHCTRL[BOOT_GCLK_ID_SLOW].reg = GCLK_PCHCTRL_GEN_GCLK3_Val | (1 << GCLK_PCHCTRL_CHEN_Pos);

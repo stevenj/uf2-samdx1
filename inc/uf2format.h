@@ -10,6 +10,9 @@
 #ifdef SAMD21
 #define APP_START_ADDRESS 0x00002000
 #endif
+#ifdef SAML21
+#define APP_START_ADDRESS 0x00002000
+#endif
 #ifdef SAMD51
 #define APP_START_ADDRESS 0x00004000
 #endif

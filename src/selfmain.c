@@ -5,6 +5,9 @@
 #ifdef SAMD21
 #define BOOTLOADER_K 8
 #endif
+#ifdef SAML21
+#define BOOTLOADER_K 8
+#endif
 #ifdef SAMD51
 #define BOOTLOADER_K 16
 #endif
@@ -24,6 +27,18 @@ uint8_t pageBuf[FLASH_ROW_SIZE];
         while (NVMCTRL->INTFLAG.bit.READY == 0) {}                             \
     } while (0)
 #endif
+
+#ifdef SAML21
+#define NVM_FUSE_ADDR NVMCTRL_AUX0_ADDRESS
+#define exec_cmd(cmd)                                                          \
+    do {                                                                       \
+        NVMCTRL->STATUS.reg |= NVMCTRL_STATUS_MASK;                            \
+        NVMCTRL->ADDR.reg = (uint32_t)NVMCTRL_USER / 2;                        \
+        NVMCTRL->CTRLA.reg = NVMCTRL_CTRLA_CMDEX_KEY | cmd;                    \
+        while (NVMCTRL->INTFLAG.bit.READY == 0) {}                             \
+    } while (0)
+#endif
+
 #ifdef SAMD51
 #define NVM_FUSE_ADDR NVMCTRL_FUSES_BOOTPROT_ADDR
 #define exec_cmd(cmd)                                                          \
@@ -38,6 +53,9 @@ void setBootProt(int v) {
     uint32_t fuses[2];
 
     #ifdef SAMD21
+    while (!(NVMCTRL->INTFLAG.reg & NVMCTRL_INTFLAG_READY)) {}
+    #endif
+    #ifdef SAML21
     while (!(NVMCTRL->INTFLAG.reg & NVMCTRL_INTFLAG_READY)) {}
     #endif
     #ifdef SAMD51
@@ -65,6 +83,12 @@ void setBootProt(int v) {
     exec_cmd(NVMCTRL_CTRLA_CMD_EAR);
     exec_cmd(NVMCTRL_CTRLA_CMD_PBC);
     #endif
+    #ifdef SAML21
+    NVMCTRL->CTRLB.reg = NVMCTRL->CTRLB.reg | NVMCTRL_CTRLB_CACHEDIS | NVMCTRL_CTRLB_MANW;
+
+    exec_cmd(NVMCTRL_CTRLA_CMD_EAR);
+    exec_cmd(NVMCTRL_CTRLA_CMD_PBC);
+    #endif
     #ifdef SAMD51
     NVMCTRL->CTRLA.bit.WMODE = NVMCTRL_CTRLA_WMODE_MAN;
 
@@ -76,6 +100,9 @@ void setBootProt(int v) {
     *(((uint32_t *)NVM_FUSE_ADDR) + 1) = fuses[1];
 
     #ifdef SAMD21
+    exec_cmd(NVMCTRL_CTRLA_CMD_WAP);
+    #endif
+    #ifdef SAML21
     exec_cmd(NVMCTRL_CTRLA_CMD_WAP);
     #endif
     #ifdef SAMD51
@@ -102,6 +129,9 @@ int main(void) {
     logmsg("Before main loop");
 
     #ifdef SAMD21
+    setBootProt(7); // 0k
+    #endif
+    #ifdef SAML21
     setBootProt(7); // 0k
     #endif
     #ifdef SAMD51
@@ -151,6 +181,9 @@ int main(void) {
     delay(20000);
 
     #ifdef SAMD21
+    setBootProt(2); // 8k
+    #endif
+    #ifdef SAML21
     setBootProt(2); // 8k
     #endif
     // For the SAMD51, the boot protection will automatically be re-enabled on

@@ -5,6 +5,9 @@ CC=arm-none-eabi-gcc
 ifeq ($(CHIP_FAMILY), samd21)
 COMMON_FLAGS = -mthumb -mcpu=cortex-m0plus -Os -ggdb3 -DSAMD21
 endif
+ifeq ($(CHIP_FAMILY), saml21)
+COMMON_FLAGS = -mthumb -mcpu=cortex-m0plus -Os -ggdb3 -DSAML21
+endif
 ifeq ($(CHIP_FAMILY), samd51)
 COMMON_FLAGS = -mthumb -mcpu=cortex-m4 -O2 -ggdb3 -DSAMD51
 endif
@@ -34,6 +37,12 @@ BOOTLOADER_SIZE=8192
 SELF_LINKER_SCRIPT=scripts/samd21j18a_self.ld
 endif
 
+ifeq ($(CHIP_FAMILY), saml21)
+LINKER_SCRIPT=scripts/saml21e18b.ld
+BOOTLOADER_SIZE=8192
+SELF_LINKER_SCRIPT=scripts/saml21e18b_self.ld
+endif
+
 ifeq ($(CHIP_FAMILY), samd51)
 LINKER_SCRIPT=scripts/samd51j19a.ld
 BOOTLOADER_SIZE=16384
@@ -53,6 +62,10 @@ INCLUDES += -I$(BUILD_PATH)
 
 ifeq ($(CHIP_FAMILY), samd21)
 INCLUDES += -Ilib/samd21/samd21a/include/
+endif
+
+ifeq ($(CHIP_FAMILY), saml21)
+INCLUDES += -Ilib/saml21/saml21b/include/
 endif
 
 ifeq ($(CHIP_FAMILY), samd51)
